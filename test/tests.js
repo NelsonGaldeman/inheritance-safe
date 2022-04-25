@@ -18,6 +18,13 @@ describe("InheritanceSafe", function () {
   it("Should validate inheritor is properly set", async function () {
     expect(await inheritanceSafe.inheritor()).to.equal(await inheritor.getAddress());
   });
+  it("Should validate inheritor can be updated", async function () {
+    const newInheritor = await ethers.getSigner(2);
+    await inheritanceSafe.setInheritor(await newInheritor.getAddress());
+    inheritor = newInheritor;
+
+    expect(await inheritanceSafe.inheritor()).to.equal(await newInheritor.getAddress());
+  });
   it("Should validate proof of life is set", async function () {
     expect((await inheritanceSafe.proofOfLife()).gt(0)).to.be.true;
   });
