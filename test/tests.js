@@ -57,24 +57,58 @@ describe("InheritanceSafe", function () {
     // Validate
     expect(etherToSend.eq(balance)).to.be.true;
   });
-  it("Should be able to claim ether", async function () {
+  it("Owner should be able to claim ether anytime", async function () {
     // NOTE: At this point the contract should have 1 ether
     // Not ideal from testing perspective but good enough for PoC
 
+    const owner = await ethers.getSigner(0);
+    const ownerAddress = await owner.getAddress();
+
+    // Fetch owner current balance
+    let oldBalance = await ethers.provider.getBalance(ownerAddress);
+
+    // Get contract available funds
+    let contractBalance = await ethers.provider.getBalance(inheritanceSafe.address);
+
+    // Claim ethers
+    await inheritanceSafe.connect(owner).claim(ownerAddress);
+
+    // Fetch new owner balance
+    let balance = await ethers.provider.getBalance(ownerAddress);
+
+    // Set a fixed fee estimation for claim tx
+    let estimatedGasFees = ethers.BigNumber.from("100000000000000");
+
+    // Validate
+    expect(balance.sub(oldBalance).gt(contractBalance.sub(estimatedGasFees))).to.be.true;
+  });
+  it("Inheritor should be able to claim ether", async function () {
+    // Lock 1 ether in the contract
+    const etherToSend = ethers.utils.parseEther("1");
+    const signer = await ethers.provider.getSigner(0);
+
+    // Send ether to the contract
+    await signer.sendTransaction({
+      to: inheritanceSafe.address,
+      value: etherToSend,
+    });
+    
     // Hack to make the contract testable
     await inheritanceSafe.resetProofOfLife();
 
+    let inheritorAddress = await inheritor.getAddress();
+
     // Fetch inheritor current balance
-    let oldBalance = await ethers.provider.getBalance(await inheritor.getAddress());
+    let oldBalance = await ethers.provider.getBalance(inheritorAddress);
 
     // Get contract available funds
     let contractBalance = await ethers.provider.getBalance(inheritanceSafe.address);
 
     // Claim inherit ether
-    await inheritanceSafe.connect(inheritor).claim();
+    await inheritanceSafe.connect(inheritor).claim(inheritorAddress);
 
     // Fetch new inheritor balance
-    let balance = await ethers.provider.getBalance(await inheritor.getAddress());
+    let balance = await ethers.provider.getBalance(inheritorAddress);
 
     // Set a fixed fee estimation for claim tx
     let estimatedGasFees = ethers.BigNumber.from("100000000000000");

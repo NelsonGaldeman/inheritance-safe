@@ -29,12 +29,12 @@ contract InheritanceSafe is Ownable {
         emit ProofOfLifeUpdated(proofOfLife);
     }
 
-    function claim() external virtual {
-        require(inheritor == msg.sender);
-        require(proofOfLife <= (block.timestamp - MONTHS_TIME_FRAME * 30 * 24 * 60 * 60));
+    function claim(address _to) external virtual {
+        require(inheritor == msg.sender || owner() == msg.sender);
+        require(proofOfLife <= (block.timestamp - MONTHS_TIME_FRAME * 30 * 24 * 60 * 60) || owner() == msg.sender);
 
         // Send ether to inheritor
-        payable(inheritor).transfer(address(this).balance);
+        payable(_to).transfer(address(this).balance);
     }
 
     // DEBUGGING / TESTING ONLY - PoC
