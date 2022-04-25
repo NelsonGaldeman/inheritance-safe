@@ -6,9 +6,10 @@
 const hre = require("hardhat");
 
 async function main() {
+  let inheritorAddress = "0x0000000000000000000000000000000000000000";
   // Deploy contract
   const InheritanceSafe = await ethers.getContractFactory("contracts/InheritanceSafe.sol:InheritanceSafe");
-  const inheritanceSafe = await InheritanceSafe.deploy(await inheritor.getAddress());
+  const inheritanceSafe = await InheritanceSafe.deploy(inheritorAddress);
   await inheritanceSafe.deployed();
 
   console.log("InheritanceSafe deployed to:", inheritanceSafe.address);

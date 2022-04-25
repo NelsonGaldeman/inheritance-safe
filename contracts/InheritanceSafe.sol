@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract InheritanceSafe is Ownable {
-    uint256 public constant MONTHS_TIME_FRAME = 6;
+    uint256 private constant MONTHS_TIME_FRAME = 6;
     address public inheritor;
     uint256 public proofOfLife;
 
